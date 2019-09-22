@@ -29,6 +29,9 @@ import com.alibaba.excel.support.ExcelTypeEnum;
 public class ExcelReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelReader.class);
 
+    public ExcelAnalyserImpl getExcelAnalyser() {
+        return (ExcelAnalyserImpl)excelAnalyser;
+    }
     /**
      * Analyser
      */

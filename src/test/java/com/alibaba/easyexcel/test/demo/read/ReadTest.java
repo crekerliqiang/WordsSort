@@ -18,6 +18,7 @@ import com.alibaba.excel.annotation.format.NumberFormat;
 import com.alibaba.excel.converters.DefaultConverterLoader;
 import com.alibaba.excel.read.metadata.ReadSheet;
 import com.alibaba.fastjson.JSON;
+import sun.rmi.runtime.Log;
 
 /**
  * 读的常见写法
@@ -49,6 +50,7 @@ public class ReadTest {
         ExcelReader excelReader = EasyExcel.read(fileName, DemoData.class, new DemoDataListener()).build();
         ReadSheet readSheet = EasyExcel.readSheet(0).build();
         excelReader.read(readSheet);
+        LOGGER.info("--------------------  name  " + readSheet.getSheetName());
         // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
         excelReader.finish();
     }
@@ -174,11 +176,12 @@ public class ReadTest {
     @Test
     public void synchronousRead() {
         String fileName = TestFileUtil.getPath() + "demo" + File.separator + "demo.xlsx";
+        LOGGER.info(" 读取的地址 " + fileName);
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 同步读取会自动finish
         List<Object> list = EasyExcel.read(fileName).head(DemoData.class).sheet().doReadSync();
         for (Object obj : list) {
             DemoData data = (DemoData)obj;
-            LOGGER.info("读取到数据:{}", JSON.toJSONString(data));
+            LOGGER.info("读取到数据--:{}", JSON.toJSONString(data));
         }
 
         // 这里 也可以不指定class，返回一个list，然后读取第一个sheet 同步读取会自动finish
@@ -186,7 +189,7 @@ public class ReadTest {
         for (Object obj : list) {
             // 返回每条数据的键值对 表示所在的列 和所在列的值
             Map<Integer, String> data = (Map<Integer, String>)obj;
-            LOGGER.info("读取到数据:{}", JSON.toJSONString(data));
+            LOGGER.info("读取到数据00:{}", JSON.toJSONString(data));
         }
     }
 

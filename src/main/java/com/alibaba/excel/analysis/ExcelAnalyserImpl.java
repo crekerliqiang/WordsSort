@@ -27,6 +27,10 @@ import com.alibaba.excel.util.FileUtils;
 public class ExcelAnalyserImpl implements ExcelAnalyser {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelAnalyserImpl.class);
 
+    public AnalysisContextImpl getAnalysisContext() {
+        return (AnalysisContextImpl)analysisContext;
+    }
+
     private AnalysisContext analysisContext;
 
     private ExcelExecutor excelExecutor;

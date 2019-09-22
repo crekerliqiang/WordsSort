@@ -28,6 +28,10 @@ public class AnalysisContextImpl implements AnalysisContext {
      * The Workbook currently written
      */
     private ReadWorkbookHolder readWorkbookHolder;
+
+    public ReadSheetHolder getReadSheetHolder() {
+        return readSheetHolder;
+    }
     /**
      * Current sheet holder
      */
@@ -65,7 +69,7 @@ public class AnalysisContextImpl implements AnalysisContext {
         }
         readWorkbookHolder.getHasReadSheet().add(readSheetHolder.getSheetNo());
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Began to read：{}", readSheetHolder);
+            LOGGER.debug("Began to read ：{}", readSheetHolder);
         }
     }
 
