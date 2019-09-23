@@ -5,6 +5,7 @@ import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.analysis.ExcelAnalyserImpl;
 import com.alibaba.excel.context.AnalysisContextImpl;
+import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.alibaba.excel.read.metadata.ReadSheet;
 import com.alibaba.excel.read.metadata.holder.ReadSheetHolder;
 import com.alibaba.excel.write.metadata.WriteSheet;
@@ -24,25 +25,32 @@ public class ReadWriteTest {
     private List<String> sheetNameList;
 
     //一共多少个 sheet「可以 填一个很大的数」
-    private static final int SHEET_NO = 3;
+    private static final int SHEET_NO = 2000;
     //多少个单词分一组
     private static final int GROUP_NUM =  6;
+
+    private static final String EMPTY = " ";
 
     @Test
     public void TestSortWords(){
 
-        ExcelWriter excelWriter = EasyExcel.write(FILE_PATH_DEST, WriteDataNew.class).build();
+        ExcelWriter excelWriter = EasyExcel.write(FILE_PATH_DEST, WriteData.class).build();
         sheetNameList = new ArrayList<String>();
         for(int i = 0;i < SHEET_NO;i++){
-            List<WriteDataNew> writeDataNews = sortWords(FILE_PATH_SRC,i,GROUP_NUM);
+            try{
+            List<WriteData> writeData = sortWords(FILE_PATH_SRC,i,GROUP_NUM);
             WriteSheet writeSheet = EasyExcel.writerSheet(i,sheetNameList.get(i)).build();
-            excelWriter.write(writeDataNews, writeSheet);
+            excelWriter.write(writeData, writeSheet);
+
+            }catch (ExcelAnalysisException e){
+                break;
+            }
         }
         excelWriter.finish();
         sheetNameList =  null;
     }
 
-    private synchronized List<WriteDataNew> sortWords(String fileNameSrc,int sheetNo,int groupNo){
+    private synchronized List<WriteData> sortWords(String fileNameSrc, int sheetNo, int groupNo){
 
         //单独读取一个sheetName
         ExcelReader excelReader = EasyExcel.read(fileNameSrc, ReadData.class, new ReadDataListener()).build();
@@ -66,17 +74,18 @@ public class ReadWriteTest {
         }
         List<ReadData> readDataSort = Tool.splitList(readData,groupNo);
 
-        List<WriteDataNew> writeData = new ArrayList<WriteDataNew>();
+        List<WriteData> writeData = new ArrayList<WriteData>();
         //组合 readData readDataSort
         for(int i =  0;i < readData.size();i++){
-            WriteDataNew writeDataNew = new WriteDataNew();
-            writeDataNew.cn0 = readData.get(i).cn;
-            writeDataNew.en0 = readData.get(i).en;
-
-            writeDataNew.cn1 = readDataSort.get(i).cn;
-            writeDataNew.en1 = readDataSort.get(i).en;
-
-            writeData.add(writeDataNew);
+            //加 一行 空格
+            if(i > 0 && i % GROUP_NUM == 0){
+                writeData.add(new WriteData(EMPTY,EMPTY,EMPTY,EMPTY));
+            }
+            writeData.add(new WriteData(
+                    readData.get(i).en,
+                    readData.get(i).cn,
+                    readDataSort.get(i).en,
+                    readDataSort.get(i).cn));
         }
         return writeData;
     }
