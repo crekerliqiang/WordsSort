@@ -11,9 +11,9 @@ import javax.validation.constraints.Size;
 
 @Data
 //列宽
-@ColumnWidth(20)
+@ColumnWidth(40)
 //行高
-@ContentRowHeight(20)
+@ContentRowHeight(40)
 //标题大小
 @HeadRowHeight(20)
 public class WriteData {

@@ -237,7 +237,8 @@ public class WriteTest {
             new HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);
 
         // 这里 需要指定写用哪个class去读，然后写到第一个sheet，名字为模板 然后文件流会自动关闭
-        EasyExcel.write(fileName, DemoData.class).registerWriteHandler(horizontalCellStyleStrategy).sheet("模板")
+        EasyExcel.write(fileName, DemoData.class).
+                registerWriteHandler(horizontalCellStyleStrategy).sheet("模板")
             .doWrite(data());
     }
 

@@ -9,6 +9,9 @@ import com.alibaba.excel.exception.ExcelAnalysisException;
 import com.alibaba.excel.read.metadata.ReadSheet;
 import com.alibaba.excel.read.metadata.holder.ReadSheetHolder;
 import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import com.alibaba.excel.write.metadata.style.WriteFont;
+import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +31,9 @@ public class ReadWriteTest {
     private static final int SHEET_NO = 2000;
     //多少个单词分一组
     private static final int GROUP_NUM =  6;
+    //字体大小
+    private static final short FRONT_SIZE =  20;
+
 
     private static final String EMPTY = " ";
 
@@ -36,10 +42,27 @@ public class ReadWriteTest {
 
         ExcelWriter excelWriter = EasyExcel.write(FILE_PATH_DEST, WriteData.class).build();
         sheetNameList = new ArrayList<String>();
+
+        // 字体大小
+        WriteCellStyle contentWriteCellStyle = new WriteCellStyle();
+        WriteFont contentWriteFont = new WriteFont();
+        WriteCellStyle writeCellStyle = new WriteCellStyle();
+        contentWriteFont.setFontHeightInPoints(FRONT_SIZE);
+
+        contentWriteCellStyle.setWriteFont(contentWriteFont);
+        HorizontalCellStyleStrategy horizontalCellStyleStrategy =
+                new HorizontalCellStyleStrategy(writeCellStyle,contentWriteCellStyle);
+
         for(int i = 0;i < SHEET_NO;i++){
             try{
             List<WriteData> writeData = sortWords(FILE_PATH_SRC,i,GROUP_NUM);
-            WriteSheet writeSheet = EasyExcel.writerSheet(i,sheetNameList.get(i)).build();
+
+
+            WriteSheet writeSheet = EasyExcel.writerSheet(i,sheetNameList.get(i))
+                    .registerWriteHandler(horizontalCellStyleStrategy)
+                    .build();
+
+
             excelWriter.write(writeData, writeSheet);
 
             }catch (ExcelAnalysisException e){
