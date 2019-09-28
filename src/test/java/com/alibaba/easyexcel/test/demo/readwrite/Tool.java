@@ -4,8 +4,13 @@ package com.alibaba.easyexcel.test.demo.readwrite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class Tool {
@@ -108,5 +113,32 @@ public class Tool {
             listList.addAll(newList);
         }
         return listList;
+    }
+
+    public static String getDate(){
+        Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_hh_mm_ss");
+        return format.format(date);
+    }
+    public static void copyFile(String srcPathStr, String desPathStr) {
+        try{
+            //2.创建输入输出流对象
+            FileInputStream fis = new FileInputStream(srcPathStr);
+            FileOutputStream fos = new FileOutputStream(desPathStr);
+
+            //创建搬运工具
+            byte datas[] = new byte[1024*8];
+            //创建长度
+            int len = 0;
+            //循环读取数据
+            while((len = fis.read(datas))!=-1){
+                fos.write(datas,0,len);
+            }
+            //3.释放资源
+            fis.close();
+            fis.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

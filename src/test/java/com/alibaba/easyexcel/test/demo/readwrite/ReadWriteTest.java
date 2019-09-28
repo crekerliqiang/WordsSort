@@ -16,11 +16,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.alibaba.easyexcel.test.demo.readwrite.Path.FILE_PATH_SRC;
 import static com.alibaba.easyexcel.test.demo.readwrite.Path.FILE_PATH_DEST;
+import static com.alibaba.easyexcel.test.demo.readwrite.Path.FILE_PATH_SRC_BACK;
 
 public class ReadWriteTest {
 
@@ -40,7 +43,12 @@ public class ReadWriteTest {
     @Test
     public void TestSortWords(){
 
-        ExcelWriter excelWriter = EasyExcel.write(FILE_PATH_DEST, WriteData.class).build();
+        //先复制一份
+        Tool.copyFile(FILE_PATH_SRC,FILE_PATH_SRC_BACK);
+
+        //开始读写
+        String pathDest = FILE_PATH_DEST + Tool.getDate() + ".xlsx";
+        ExcelWriter excelWriter = EasyExcel.write(pathDest, WriteData.class).build();
         sheetNameList = new ArrayList<String>();
 
         // 字体大小
@@ -71,22 +79,35 @@ public class ReadWriteTest {
         }
         excelWriter.finish();
         sheetNameList =  null;
+
+        //恢复原来的文件
+        new File(FILE_PATH_SRC).delete();
+        new File(FILE_PATH_SRC_BACK).renameTo(new File(FILE_PATH_SRC));
     }
 
     private synchronized List<WriteData> sortWords(String fileNameSrc, int sheetNo, int groupNo){
 
+        ExcelReader excelReader = null;
         //单独读取一个sheetName
-        ExcelReader excelReader = EasyExcel.read(fileNameSrc, ReadData.class, new ReadDataListener()).build();
-        ReadSheet readSheet = EasyExcel.readSheet(sheetNo).build();
-        excelReader.read(readSheet);
+        try{
+            excelReader = EasyExcel.read(fileNameSrc, ReadData.class, new ReadDataListener()).build();
+            ReadSheet readSheet = EasyExcel.readSheet(sheetNo).build();
+            excelReader.read(readSheet);
 
-        ExcelAnalyserImpl excelAnalyser = excelReader.getExcelAnalyser();
-        AnalysisContextImpl analysisContext = excelAnalyser.getAnalysisContext();
-        ReadSheetHolder readSheetHolder = analysisContext.getReadSheetHolder();
-        String sheetName  = readSheetHolder.getSheetName();
-        sheetNameList.add(sheetName);
-        // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
-        excelReader.finish();
+            ExcelAnalyserImpl excelAnalyser = excelReader.getExcelAnalyser();
+            AnalysisContextImpl analysisContext = excelAnalyser.getAnalysisContext();
+            ReadSheetHolder readSheetHolder = analysisContext.getReadSheetHolder();
+            String sheetName  = readSheetHolder.getSheetName();
+            sheetNameList.add(sheetName);
+        }catch (ExcelAnalysisException e){
+
+        }finally {
+            // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
+            if(null != excelReader){
+                excelReader.finish();
+            }
+        }
+
 
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 同步读取会自动finish
         List<Object> list = EasyExcel.read(fileNameSrc).head(ReadData.class).sheet(sheetNo).doReadSync();
