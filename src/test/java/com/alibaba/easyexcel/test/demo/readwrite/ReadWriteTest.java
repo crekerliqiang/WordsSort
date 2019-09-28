@@ -57,7 +57,7 @@ public class ReadWriteTest {
             try{
             List<WriteData> writeData = sortWords(FILE_PATH_SRC,i,GROUP_NUM);
 
-
+            if("记忆法".equals(sheetNameList.get(i)))continue;
             WriteSheet writeSheet = EasyExcel.writerSheet(i,sheetNameList.get(i))
                     .registerWriteHandler(horizontalCellStyleStrategy)
                     .build();
